@@ -1,3 +1,4 @@
+![image](https://github.com/Nyandiekahh/Flatiron-Bank/assets/166758870/86e2a9c7-2361-440f-898a-68c88a88b574)
 # Bank-of-Flatiron
 # Flatiron-Bank
 # Getting Started with Create React App
