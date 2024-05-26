@@ -6,43 +6,38 @@ import axios from 'axios';
 const TransactionList = ({ transactions, setTransactions }) => {
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
 
+  // Fetch transactions when the component mounts
   useEffect(() => {
     fetchTransactions();
   }, []);
 
-  const fetchTransactions = () => {
-    axios.get('http://localhost:8001/transactions')
-      .then(response => {
-        setTransactions(response.data);
-      })
-      .catch(error => {
-        console.error('There was an error fetching the transactions!', error);
-      });
-  };
-
-  const handleDelete = (id) => {
-    axios.delete(`http://localhost:8001/transactions/${id}`)
-      .then(() => {
-        setTransactions(transactions.filter(transaction => transaction.id !== id));
-      })
-      .catch(error => {
-        console.error('There was an error deleting the transaction!', error);
-      });
-  };
-
-  const handleSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
+  // Function to retrieve transactions from the API
+  const fetchTransactions = async () => {
+    try {
+      const response = await axios.get('http://localhost:8001/transactions');
+      setTransactions(response.data);
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
     }
+  };
 
+  // Function to delete a transaction
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:8001/transactions/${id}`);
+      setTransactions(transactions.filter(transaction => transaction.id !== id));
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+    }
+  };
+
+  // Function to sort the transactions
+  const handleSort = (key) => {
+    const direction = sortConfig.key === key && sortConfig.direction === 'ascending' ? 'descending' : 'ascending';
+    
     const sortedTransactions = [...transactions].sort((a, b) => {
-      if (a[key] < b[key]) {
-        return direction === 'ascending' ? -1 : 1;
-      }
-      if (a[key] > b[key]) {
-        return direction === 'ascending' ? 1 : -1;
-      }
+      if (a[key] < b[key]) return direction === 'ascending' ? -1 : 1;
+      if (a[key] > b[key]) return direction === 'ascending' ? 1 : -1;
       return 0;
     });
 
@@ -52,7 +47,7 @@ const TransactionList = ({ transactions, setTransactions }) => {
 
   return (
     <div>
-      <h2>Transactions</h2>
+      <h2>Transaction List</h2>
       <div>
         <button onClick={() => handleSort('description')}>Sort by Description</button>
         <button onClick={() => handleSort('category')}>Sort by Category</button>

@@ -3,40 +3,46 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const TransactionForm = () => {
-  const [formData, setFormData] = useState({
+const TransactionForm = ({ onAddTransaction }) => {
+  const [transactionDetails, setTransactionDetails] = useState({
     date: '',
     description: '',
     amount: '',
   });
 
-  const handleChange = e => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setTransactionDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: value,
+    }));
   };
 
-  const handleSubmit = async e => {
-    e.preventDefault();
+  const submitTransaction = async (event) => {
+    event.preventDefault();
     try {
-      await axios.post('http://localhost:8001/transactions', formData);
+      const response = await axios.post('http://localhost:8001/transactions', transactionDetails);
       alert('Transaction added successfully!');
-      setFormData({ date: '', description: '', amount: '' });
+      setTransactionDetails({ date: '', description: '', amount: '' });
+      if (onAddTransaction) {
+        onAddTransaction(response.data);
+      }
     } catch (error) {
-      console.error('Error adding transaction:', error);
+      console.error('Failed to add transaction:', error);
     }
   };
 
   return (
     <div>
-      <h2>Add New Transaction</h2>
-      <form onSubmit={handleSubmit}>
+      <h2>Add a New Transaction</h2>
+      <form onSubmit={submitTransaction}>
         <div>
           <label>Date:</label>
           <input
             type="text"
             name="date"
-            value={formData.date}
-            onChange={handleChange}
+            value={transactionDetails.date}
+            onChange={handleInputChange}
             required
           />
         </div>
@@ -45,8 +51,8 @@ const TransactionForm = () => {
           <input
             type="text"
             name="description"
-            value={formData.description}
-            onChange={handleChange}
+            value={transactionDetails.description}
+            onChange={handleInputChange}
             required
           />
         </div>
@@ -55,8 +61,8 @@ const TransactionForm = () => {
           <input
             type="text"
             name="amount"
-            value={formData.amount}
-            onChange={handleChange}
+            value={transactionDetails.amount}
+            onChange={handleInputChange}
             required
           />
         </div>
